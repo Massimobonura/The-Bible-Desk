@@ -351,6 +351,20 @@ nav{background:var(--navy);position:sticky;top:0;z-index:200;box-shadow:0 2px 16
   font-family:'Inter',sans-serif;transition:background .2s;
 }
 .premium-lock-btn:hover{background:var(--orange2);}
+
+.preview-intro{font-size:.95rem;color:var(--black);line-height:1.65;margin-bottom:18px;padding:12px 16px;background:var(--warm);border-radius:8px;}
+.preview-verse-card{margin-bottom:16px;border:1.5px solid var(--border);border-radius:10px;overflow:hidden;}
+.preview-verse-card .preview-verse{border-left:none;border-radius:0;margin-bottom:0;border-bottom:1px solid var(--border);}
+.preview-verse-footer{display:flex;align-items:center;justify-content:space-between;padding:8px 16px;background:var(--white);}
+.preview-note{font-size:.83rem;color:var(--muted);line-height:1.5;padding:8px 16px 10px;background:var(--white);}
+.trans-links{display:flex;gap:6px;}
+.trans-link{
+  font-size:.72rem;font-weight:700;color:var(--navy);
+  background:var(--warm);border:1px solid var(--border);
+  padding:3px 9px;border-radius:12px;text-decoration:none;
+  transition:all .18s;
+}
+.trans-link:hover{background:var(--navy);color:var(--white);border-color:var(--navy);}
 </style>
 </head>
 <body>
@@ -827,42 +841,107 @@ async function doSearch() {
   const previewBody = document.getElementById('search-preview-body');
   const fullEl = document.getElementById('search-result');
 
-  // Hide full result, show preview loading
   fullEl.style.display = 'none';
   previewEl.style.display = 'block';
   previewTitle.textContent = query;
-  previewBody.innerHTML = '<div class="ai-loading"><div class="loader"></div><p>Looking that up...</p></div>';
+  previewBody.innerHTML = '<div class="ai-loading"><div class="loader"></div><p>Finding relevant verses...</p></div>';
 
-  // Get a SHORT preview - just a verse and one sentence teaser
-  const previewPrompt = `You are a Bible scholar. For this query: "${query}"
+  const previewPrompt = `You are a Bible scholar. Someone searched for: "${query}"
 
-Respond ONLY with valid JSON in this exact format, nothing else:
+Return ONLY a raw JSON object. No markdown. No backticks. No explanation. Just the JSON.
+
 {
-  "verse_ref": "Book Chapter:Verse",
-  "verse_text": "Full verse text here",
-  "teaser": "One compelling sentence about what makes this passage significant or surprising."
+  "intro": "One sentence introducing this topic from a Biblical perspective.",
+  "verses": [
+    {"ref": "Book Chapter:Verse", "text": "Full verse text.", "note": "One sentence on why this verse matters for this topic."},
+    {"ref": "Book Chapter:Verse", "text": "Full verse text.", "note": "One sentence on why this verse matters for this topic."},
+    {"ref": "Book Chapter:Verse", "text": "Full verse text.", "note": "One sentence on why this verse matters for this topic."}
+  ]
 }
 
-If the query is a concept not a specific verse, pick the single most relevant verse. Keep teaser under 20 words.`;
+Pick the 3 most relevant verses. Use accurate verse text. Keep notes under 15 words each.`;
 
   try {
-    const text = await callClaude(previewPrompt);
-    const clean = text.replace(/\`\`\`json|\`\`\`/g, '').trim();
+    const rawText = await callClaude(previewPrompt);
+    // Aggressively clean the response
+    let clean = rawText.trim();
+    clean = clean.replace(/^```json\s*/i, '').replace(/```\s*$/i, '');
+    clean = clean.replace(/^```\s*/i, '').replace(/```\s*$/i, '');
+    // Find the JSON object
+    const start = clean.indexOf('{');
+    const end = clean.lastIndexOf('}');
+    if (start === -1 || end === -1) throw new Error('No JSON found');
+    clean = clean.slice(start, end + 1);
+    
     const data = JSON.parse(clean);
 
+    // Build YouVersion links
+    function youversionLink(ref, translation) {
+      // Parse ref like "John 3:16" or "1 Corinthians 13:4"
+      const codes = {
+        'Genesis':'GEN','Exodus':'EXO','Leviticus':'LEV','Numbers':'NUM','Deuteronomy':'DEU',
+        'Joshua':'JOS','Judges':'JDG','Ruth':'RUT','1 Samuel':'1SA','2 Samuel':'2SA',
+        '1 Kings':'1KI','2 Kings':'2KI','1 Chronicles':'1CH','2 Chronicles':'2CH',
+        'Ezra':'EZR','Nehemiah':'NEH','Esther':'EST','Job':'JOB','Psalms':'PSA','Psalm':'PSA',
+        'Proverbs':'PRO','Ecclesiastes':'ECC','Song of Solomon':'SNG','Isaiah':'ISA',
+        'Jeremiah':'JER','Lamentations':'LAM','Ezekiel':'EZK','Daniel':'DAN',
+        'Hosea':'HOS','Joel':'JOL','Amos':'AMO','Obadiah':'OBA','Jonah':'JON',
+        'Micah':'MIC','Nahum':'NAM','Habakkuk':'HAB','Zephaniah':'ZEP','Haggai':'HAG',
+        'Zechariah':'ZEC','Malachi':'MAL','Matthew':'MAT','Mark':'MRK','Luke':'LUK',
+        'John':'JHN','Acts':'ACT','Romans':'ROM','1 Corinthians':'1CO','2 Corinthians':'2CO',
+        'Galatians':'GAL','Ephesians':'EPH','Philippians':'PHP','Colossians':'COL',
+        '1 Thessalonians':'1TH','2 Thessalonians':'2TH','1 Timothy':'1TI','2 Timothy':'2TI',
+        'Titus':'TIT','Philemon':'PHM','Hebrews':'HEB','James':'JAS','1 Peter':'1PE',
+        '2 Peter':'2PE','1 John':'1JN','2 John':'2JN','3 John':'3JN','Jude':'JUD',
+        'Revelation':'REV'
+      };
+      // Extract book and reference
+      const parts = ref.match(/^(\d?\s?[A-Za-z\s]+)\s+(\d+:\d+)/);
+      if (!parts) return null;
+      const bookName = parts[1].trim();
+      const verseRef = parts[2].replace(':', '.');
+      const bookCode = codes[bookName];
+      if (!bookCode) return null;
+      // Translation IDs on YouVersion: NLT=116, NIV=111, ESV=59, KJV=1
+      const transIds = {NLT:'116',NIV:'111',ESV:'59',KJV:'1'};
+      const tid = transIds[translation] || '116';
+      return `https://www.bible.com/bible/${tid}/${bookCode}.${verseRef}`;
+    }
+
+    let versesHTML = data.verses.map(v => {
+      const nltUrl = youversionLink(v.ref, 'NLT');
+      const nivUrl = youversionLink(v.ref, 'NIV');
+      const esvUrl = youversionLink(v.ref, 'ESV');
+      const linksHTML = [
+        nltUrl ? `<a href="${nltUrl}" target="_blank" class="trans-link">NLT</a>` : '',
+        nivUrl ? `<a href="${nivUrl}" target="_blank" class="trans-link">NIV</a>` : '',
+        esvUrl ? `<a href="${esvUrl}" target="_blank" class="trans-link">ESV</a>` : '',
+      ].filter(Boolean).join('');
+
+      return `
+        <div class="preview-verse-card">
+          <div class="preview-verse">"${v.text}"</div>
+          <div class="preview-verse-footer">
+            <div class="preview-ref">${v.ref}</div>
+            <div class="trans-links">${linksHTML}</div>
+          </div>
+          <div class="preview-note">${v.note}</div>
+        </div>`;
+    }).join('');
+
     previewBody.innerHTML = `
-      <div class="preview-verse">"${data.verse_text}"</div>
-      <div class="preview-ref">${data.verse_ref}</div>
-      <div class="preview-teaser">${data.teaser}</div>
+      <div class="preview-intro">${data.intro}</div>
+      ${versesHTML}
       <button class="study-btn" onclick="studyThisVerse()">
-        📖 Study This Verse &rarr;
+        📖 Get Full AI Breakdown &rarr;
       </button>`;
+
   } catch(e) {
-    // Fallback if JSON parse fails - just show study button
+    console.error('Preview error:', e);
     previewBody.innerHTML = `
-      <div class="preview-teaser">Ready to dive deep into this topic?</div>
+      <div class="preview-intro">Here are some key Bible passages on this topic.</div>
       <button class="study-btn" onclick="studyThisVerse()">
-        📖 Study This &rarr;
+        📖 Get Full AI Breakdown &rarr;
       </button>`;
   }
 }
