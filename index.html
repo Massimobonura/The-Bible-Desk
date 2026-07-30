@@ -293,6 +293,29 @@ nav{background:var(--navy);position:sticky;top:0;z-index:200;box-shadow:0 2px 16
   .ws-row{grid-template-columns:1fr;}
   .hero-actions{flex-direction:column;align-items:center;}
 }
+
+/* AUTH MODAL */
+.auth-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:2000;display:none;align-items:center;justify-content:center;padding:20px;}
+.auth-modal-overlay.show{display:flex;}
+.auth-modal{background:var(--white);border-radius:20px;max-width:420px;width:100%;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.4);}
+.auth-modal-head{background:var(--navy);padding:28px 28px 20px;}
+.auth-modal-head h3{font-family:'Montserrat',sans-serif;font-size:1.3rem;font-weight:800;color:var(--white);margin-bottom:4px;}
+.auth-modal-head p{color:#8899BB;font-size:.85rem;}
+.auth-modal-close{float:right;background:none;border:none;color:#8899BB;font-size:1.4rem;cursor:pointer;margin-top:-2px;}
+.auth-modal-close:hover{color:var(--white);}
+.auth-modal-body{padding:28px;}
+.auth-divider{display:flex;align-items:center;gap:12px;margin:20px 0;}
+.auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--border);}
+.auth-divider span{font-size:.78rem;color:var(--muted);white-space:nowrap;}
+.auth-input{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:.95rem;font-family:'Inter',sans-serif;outline:none;margin-bottom:12px;transition:border-color .2s;}
+.auth-input:focus{border-color:var(--orange);}
+.auth-submit{width:100%;padding:13px;background:var(--navy);color:var(--white);border:none;border-radius:10px;font-size:.95rem;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:background .2s;margin-bottom:12px;}
+.auth-submit:hover{background:var(--orange);}
+.auth-toggle{text-align:center;font-size:.82rem;color:var(--muted);}
+.auth-toggle a{color:var(--orange);cursor:pointer;font-weight:600;text-decoration:none;}
+.auth-toggle a:hover{text-decoration:underline;}
+.auth-error{background:#FEF2F2;border:1px solid #FCA5A5;color:#DC2626;padding:10px 14px;border-radius:8px;font-size:.85rem;margin-bottom:12px;display:none;}
+.auth-error.show{display:block;}
 </style>
 </head>
 <body>
@@ -310,7 +333,7 @@ nav{background:var(--navy);position:sticky;top:0;z-index:200;box-shadow:0 2px 16
         <span class="nav-tab" onclick="showPage('saved')" id="tab-saved">Saved</span>
       </div>
       <div id="auth-area">
-        <button class="nav-btn primary" onclick="signInWithGoogle()">Sign in with Google</button>
+        <button class="nav-btn primary" onclick="openAuthModal()">Sign in</button>
       </div>
     </div>
   </div>
@@ -409,8 +432,7 @@ nav{background:var(--navy);position:sticky;top:0;z-index:200;box-shadow:0 2px 16
       <h2>Bible Study Worksheet</h2>
       <p>Work through any passage using the 5-step method. Save your notes to revisit later.</p>
     </div>
-    <div id="worksheet-gate"></div>
-    <div id="worksheet-form" style="display:none;">
+    <div id="worksheet-form">
       <div class="ws-card">
         <div class="ws-card-head"><h3>Passage Details</h3></div>
         <div class="ws-card-body">
@@ -477,7 +499,6 @@ nav{background:var(--navy);position:sticky;top:0;z-index:200;box-shadow:0 2px 16
       <h2>Saved Worksheets</h2>
       <p>All your saved Bible study sessions in one place.</p>
     </div>
-    <div id="saved-gate"></div>
     <div id="saved-list"></div>
   </div>
 </div>
@@ -540,7 +561,7 @@ function setUser(user) {
 function clearUser() {
   currentUser = null;
   document.getElementById('auth-area').innerHTML = `
-    <button class="nav-btn primary" onclick="signInWithGoogle()">Sign in with Google</button>`;
+    <button class="nav-btn primary" onclick="openAuthModal()">Sign in</button>`;
   updateAuthGates();
 }
 
@@ -916,7 +937,10 @@ function clearWorksheet() {
 }
 
 async function saveWorksheet() {
-  if (!currentUser) { showToast('Sign in to save worksheets', 'error'); return; }
+  if (!currentUser) {
+    openAuthModal('Save your worksheet', 'Create a free account to save and access all your Bible study notes.');
+    return;
+  }
   const passage = document.getElementById('ws-passage').value.trim();
   if (!passage) { showToast('Add a passage first', 'error'); return; }
 
@@ -947,7 +971,15 @@ async function saveWorksheet() {
 
 // ── SAVED WORKSHEETS ──────────────────────────────────────────────────────────
 async function loadSavedWorksheets() {
-  if (!currentUser) return;
+  if (!currentUser) {
+    document.getElementById('saved-list').innerHTML = `
+      <div class="saved-empty">
+        <h3>Sign in to see your saved worksheets</h3>
+        <p>Your Bible study notes are waiting for you.</p>
+        <button class="btn btn-primary" onclick="openAuthModal()" style="margin-top:16px;">Sign in</button>
+      </div>`;
+    return;
+  }
   const listEl = document.getElementById('saved-list');
   listEl.innerHTML = '<div class="ai-loading"><div class="loader"></div><p>Loading...</p></div>';
 
@@ -1007,5 +1039,36 @@ initAuth();
 clearWorksheet();
 updateAuthGates();
 </script>
+
+<!-- AUTH MODAL -->
+<div class="auth-modal-overlay" id="auth-modal-overlay">
+  <div class="auth-modal">
+    <div class="auth-modal-head">
+      <button class="auth-modal-close" onclick="closeAuthModal()">&times;</button>
+      <h3 id="auth-modal-title">Welcome to The Bible Desk</h3>
+      <p id="auth-modal-sub">Sign in or create a free account to save your study notes.</p>
+    </div>
+    <div class="auth-modal-body">
+      <!-- Google -->
+      <button class="google-btn" style="width:100%;justify-content:center;padding:13px 20px;" onclick="signInWithGoogle()">
+        <svg viewBox="0 0 24 24" width="20" height="20"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+        Continue with Google
+      </button>
+
+      <div class="auth-divider"><span>or use your email</span></div>
+
+      <div id="auth-error" class="auth-error"></div>
+
+      <input type="email" class="auth-input" id="auth-email" placeholder="Email address" autocomplete="email">
+      <input type="password" class="auth-input" id="auth-password" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key==='Enter')submitAuth()">
+      <button class="auth-submit" id="auth-submit-btn" onclick="submitAuth()">Sign in</button>
+
+      <div class="auth-toggle">
+        <span id="auth-toggle-text">Don't have an account?</span>
+        <a onclick="toggleAuthMode()" id="auth-toggle-link">Create one free</a>
+      </div>
+    </div>
+  </div>
+</div>
 </body>
 </html>
