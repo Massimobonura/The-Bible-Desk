@@ -316,6 +316,41 @@ nav{background:var(--navy);position:sticky;top:0;z-index:200;box-shadow:0 2px 16
 .auth-toggle a:hover{text-decoration:underline;}
 .auth-error{background:#FEF2F2;border:1px solid #FCA5A5;color:#DC2626;padding:10px 14px;border-radius:8px;font-size:.85rem;margin-bottom:12px;display:none;}
 .auth-error.show{display:block;}
+
+.study-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--orange);color:var(--white);
+  padding:13px 24px;border-radius:10px;border:none;
+  font-size:.95rem;font-weight:700;cursor:pointer;
+  font-family:'Inter',sans-serif;transition:all .2s;
+  margin-top:16px;width:100%;justify-content:center;
+}
+.study-btn:hover{background:var(--orange2);transform:translateY(-1px);}
+.preview-verse{
+  background:var(--warm);border-left:3px solid var(--orange);
+  padding:16px 20px;border-radius:0 8px 8px 0;
+  font-size:1rem;line-height:1.7;color:var(--navy);
+  margin-bottom:8px;
+}
+.preview-ref{
+  font-size:.75rem;font-weight:700;color:var(--orange);
+  text-transform:uppercase;letter-spacing:.08em;margin-bottom:16px;
+}
+.preview-teaser{font-size:.9rem;color:var(--muted);line-height:1.6;margin-bottom:4px;}
+.premium-lock{
+  background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 100%);
+  border-radius:12px;padding:20px;text-align:center;margin-top:16px;
+}
+.premium-lock-icon{font-size:1.6rem;margin-bottom:8px;}
+.premium-lock h4{color:var(--white);font-size:1rem;font-weight:700;margin-bottom:6px;}
+.premium-lock p{color:#8899BB;font-size:.85rem;margin-bottom:16px;line-height:1.5;}
+.premium-lock-btn{
+  background:var(--orange);color:var(--white);
+  padding:11px 24px;border-radius:8px;border:none;
+  font-size:.9rem;font-weight:700;cursor:pointer;
+  font-family:'Inter',sans-serif;transition:background .2s;
+}
+.premium-lock-btn:hover{background:var(--orange2);}
 </style>
 </head>
 <body>
@@ -367,8 +402,8 @@ nav{background:var(--navy);position:sticky;top:0;z-index:200;box-shadow:0 2px 16
         <div class="spin-book-name" id="spin-book"></div>
         <div class="spin-ref" id="spin-ref-display"></div>
         <div class="spin-verse" id="spin-verse-text"></div>
-        <button class="spin-ai-btn" onclick="getAIBreakdown(currentSpinRef, currentSpinVerse, 'spin-ai-output')">
-          Get Full AI Breakdown &rarr;
+        <button class="spin-ai-btn" onclick="studySpinVerse()">
+          📖 Study This Verse &rarr;
         </button>
         <div id="spin-ai-output" style="margin-top:16px;"></div>
       </div>
@@ -388,20 +423,31 @@ nav{background:var(--navy);position:sticky;top:0;z-index:200;box-shadow:0 2px 16
       <button class="search-submit" onclick="doSearch()">Search</button>
     </div>
     <div class="search-examples">
-      <span class="ex-chip" onclick="setSearch('Romans 8:28')">Romans 8:28</span>
-      <span class="ex-chip" onclick="setSearch('Philippians 4:13')">Philippians 4:13</span>
-      <span class="ex-chip" onclick="setSearch('What does grace mean?')">What is grace?</span>
-      <span class="ex-chip" onclick="setSearch('The Sermon on the Mount')">Sermon on the Mount</span>
-      <span class="ex-chip" onclick="setSearch('Psalm 23')">Psalm 23</span>
-      <span class="ex-chip" onclick="setSearch('Faith vs works')">Faith vs works</span>
+      <span class="ex-chip" onclick="setSearch('What is grace?')">What is grace?</span>
+      <span class="ex-chip" onclick="setSearch('What does the Bible say about anxiety?')">Anxiety &amp; fear</span>
+      <span class="ex-chip" onclick="setSearch('What does the Bible say about relationships and dating?')">Relationships &amp; dating</span>
+      <span class="ex-chip" onclick="setSearch('How do I know God has a plan for my life?')">God's plan for my life</span>
+      <span class="ex-chip" onclick="setSearch('What does the Bible say about forgiveness?')">Forgiveness</span>
+      <span class="ex-chip" onclick="setSearch('How do I deal with temptation as a Christian?')">Dealing with temptation</span>
+      <span class="ex-chip" onclick="setSearch('What does the Bible say about money and wealth?')">Money &amp; wealth</span>
+      <span class="ex-chip" onclick="setSearch('How do I hear from God?')">Hearing from God</span>
+      <span class="ex-chip" onclick="setSearch('What is faith and how do I grow it?')">What is faith?</span>
+      <span class="ex-chip" onclick="setSearch('What does the Bible say about purpose?')">Finding your purpose</span>
     </div>
-    <div class="ai-result" id="search-result">
+    <!-- Search preview card (free) -->
+    <div class="ai-result" id="search-preview" style="display:none;">
       <div class="ai-result-head">
-        <div class="ai-result-title" id="search-result-title">Result</div>
+        <div class="ai-result-title" id="search-preview-title">Result</div>
       </div>
-      <div class="ai-result-body" id="search-result-body">
-        <div class="ai-loading"><div class="loader"></div><p>Getting your breakdown...</p></div>
+      <div class="ai-result-body" id="search-preview-body"></div>
+    </div>
+
+    <!-- Full breakdown (premium) -->
+    <div class="ai-result" id="search-result" style="display:none;">
+      <div class="ai-result-head">
+        <div class="ai-result-title" id="search-result-title">Full Study Breakdown</div>
       </div>
+      <div class="ai-result-body" id="search-result-body"></div>
     </div>
   </div>
 </div>
@@ -769,17 +815,79 @@ function setSearch(term) {
   doSearch();
 }
 
+let currentSearchQuery = '';
+
 async function doSearch() {
   const query = document.getElementById('search-input').value.trim();
   if (!query) return;
+  currentSearchQuery = query;
 
-  const resultEl = document.getElementById('search-result');
+  const previewEl = document.getElementById('search-preview');
+  const previewTitle = document.getElementById('search-preview-title');
+  const previewBody = document.getElementById('search-preview-body');
+  const fullEl = document.getElementById('search-result');
+
+  // Hide full result, show preview loading
+  fullEl.style.display = 'none';
+  previewEl.style.display = 'block';
+  previewTitle.textContent = query;
+  previewBody.innerHTML = '<div class="ai-loading"><div class="loader"></div><p>Looking that up...</p></div>';
+
+  // Get a SHORT preview - just a verse and one sentence teaser
+  const previewPrompt = `You are a Bible scholar. For this query: "${query}"
+
+Respond ONLY with valid JSON in this exact format, nothing else:
+{
+  "verse_ref": "Book Chapter:Verse",
+  "verse_text": "Full verse text here",
+  "teaser": "One compelling sentence about what makes this passage significant or surprising."
+}
+
+If the query is a concept not a specific verse, pick the single most relevant verse. Keep teaser under 20 words.`;
+
+  try {
+    const text = await callClaude(previewPrompt);
+    const clean = text.replace(/\`\`\`json|\`\`\`/g, '').trim();
+    const data = JSON.parse(clean);
+
+    previewBody.innerHTML = `
+      <div class="preview-verse">"${data.verse_text}"</div>
+      <div class="preview-ref">${data.verse_ref}</div>
+      <div class="preview-teaser">${data.teaser}</div>
+      <button class="study-btn" onclick="studyThisVerse()">
+        📖 Study This Verse &rarr;
+      </button>`;
+  } catch(e) {
+    // Fallback if JSON parse fails - just show study button
+    previewBody.innerHTML = `
+      <div class="preview-teaser">Ready to dive deep into this topic?</div>
+      <button class="study-btn" onclick="studyThisVerse()">
+        📖 Study This &rarr;
+      </button>`;
+  }
+}
+
+async function studyThisVerse() {
+  const query = currentSearchQuery;
+
+  // Check if user is subscribed (for now check if logged in - subscription check comes later)
+  if (!currentUser) {
+    openAuthModal('Unlock Full Study Breakdown', 'Create a free account and subscribe to get AI-powered deep dives on any verse or topic.');
+    return;
+  }
+
+  // TODO: Check subscription status here when Stripe is connected
+  // For now, logged in users get access
+  const fullEl = document.getElementById('search-result');
   const titleEl = document.getElementById('search-result-title');
   const bodyEl = document.getElementById('search-result-body');
 
-  resultEl.classList.add('show');
+  fullEl.style.display = 'block';
   titleEl.textContent = query;
-  bodyEl.innerHTML = '<div class="ai-loading"><div class="loader"></div><p>Getting your breakdown...</p></div>';
+  bodyEl.innerHTML = '<div class="ai-loading"><div class="loader"></div><p>Building your full breakdown...</p></div>';
+
+  // Scroll to it
+  fullEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
   const prompt = `You are a Bible scholar providing a deep, accessible breakdown for someone studying Scripture.
 
@@ -793,14 +901,14 @@ Provide a structured breakdown with these exact sections:
 ## How It Applies Today
 ## One Thing to Remember
 
-Keep each section 2-4 sentences. Be specific, insightful, and practical. If this is a specific verse, include the full verse text at the start of Overview. Write for someone who genuinely wants to understand and apply Scripture.`;
+Keep each section 3-5 sentences. Be specific, insightful, and practical. If this is a specific verse, include the full verse text at the start of Overview. Write for someone who genuinely wants to understand and apply Scripture.`;
 
   try {
     const text = await callClaude(prompt);
     const sections = parseBreakdown(text);
     bodyEl.innerHTML = renderBreakdown(sections);
   } catch(e) {
-    bodyEl.innerHTML = '<p style="color:#e53e3e;">Could not load breakdown. Check your API key and try again.</p>';
+    bodyEl.innerHTML = '<p style="color:#e53e3e;">Could not load breakdown. Please try again.</p>';
   }
 }
 
