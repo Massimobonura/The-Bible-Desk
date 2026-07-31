@@ -43,24 +43,14 @@ nav{background:var(--navy);position:sticky;top:0;z-index:200;box-shadow:0 2px 16
 .page{display:none;}.page.active{display:block;}
 
 /* HERO */
-.hero{background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 100%);padding:72px 24px 60px;text-align:center;}
-.hero-eyebrow{font-size:.75rem;font-weight:700;letter-spacing:.14em;color:var(--orange);text-transform:uppercase;margin-bottom:16px;}
-.hero h1{font-family:'Montserrat', sans-serif;font-size:clamp(2.2rem,5vw,3.6rem);font-weight:700;color:var(--white);line-height:1.15;margin-bottom:16px;}
-.hero h1 em{font-style:normal;color:var(--orange);}
-.hero-sub{font-size:1.05rem;color:#B8C4D8;max-width:520px;margin:0 auto 40px;line-height:1.65;}
-.hero-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+/* hero replaced by home-hero */
 .btn{padding:13px 26px;border-radius:8px;font-size:.95rem;font-weight:600;cursor:pointer;border:none;font-family:'Inter',sans-serif;transition:all .2s;text-decoration:none;display:inline-flex;align-items:center;gap:8px;}
 .btn-primary{background:var(--orange);color:var(--white);}
 .btn-primary:hover{background:var(--orange2);transform:translateY(-1px);}
 .btn-ghost{background:transparent;color:var(--white);border:2px solid rgba(255,255,255,.3);}
 .btn-ghost:hover{border-color:var(--orange);color:var(--orange);}
 
-/* SPINNER SECTION */
-.spinner-section{max-width:700px;margin:0 auto;padding:56px 24px;}
-.section-head{text-align:center;margin-bottom:36px;}
-.section-head h2{font-family:'Montserrat', sans-serif;font-size:1.9rem;color:var(--navy);margin-bottom:8px;}
-.section-head p{color:var(--muted);font-size:.95rem;}
-.spinner-card{background:var(--white);border:1.5px solid var(--border);border-radius:16px;padding:40px;text-align:center;}
+/* spinner-section replaced by spin-hero */
 @keyframes slotSpin {
   0%{transform:translateY(0);}
   100%{transform:translateY(-100%);}
@@ -365,6 +355,97 @@ nav{background:var(--navy);position:sticky;top:0;z-index:200;box-shadow:0 2px 16
   transition:all .18s;
 }
 .trans-link:hover{background:var(--navy);color:var(--white);border-color:var(--navy);}
+
+/* ── HOME PAGE REDESIGN ── */
+.home-hero{
+  background:linear-gradient(170deg, #0D1B35 0%, #1B2A4A 50%, #0D1B35 100%);
+  min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;
+  padding:48px 24px 60px;
+  position:relative;overflow:hidden;
+}
+/* Subtle grid overlay */
+.home-hero::before{
+  content:'';position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(232,98,42,.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(232,98,42,.04) 1px, transparent 1px);
+  background-size:60px 60px;
+  pointer-events:none;
+}
+.home-hero-top{text-align:center;margin-bottom:48px;position:relative;z-index:1;}
+.home-eyebrow{
+  font-size:.72rem;font-weight:800;letter-spacing:.2em;
+  color:var(--orange);text-transform:uppercase;margin-bottom:16px;
+}
+.home-title{
+  font-family:'Montserrat',sans-serif;
+  font-size:clamp(2.8rem,7vw,5rem);
+  font-weight:900;color:var(--white);
+  line-height:1.05;letter-spacing:-.03em;
+  margin-bottom:16px;
+}
+.home-title span{color:var(--orange);}
+.home-tagline{
+  font-size:clamp(1rem,2.5vw,1.2rem);
+  color:#8899BB;max-width:480px;margin:0 auto;
+  line-height:1.6;font-weight:400;
+}
+
+/* SPIN HERO */
+.spin-hero{
+  width:100%;max-width:680px;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:24px;
+  padding:40px 36px;
+  text-align:center;
+  position:relative;z-index:1;
+  backdrop-filter:blur(10px);
+  box-shadow:0 32px 64px rgba(0,0,0,.4), 0 0 0 1px rgba(232,98,42,.15);
+  margin-bottom:40px;
+}
+.spin-hero-label{
+  font-size:.72rem;font-weight:900;letter-spacing:.22em;
+  color:var(--orange);text-transform:uppercase;margin-bottom:10px;
+}
+.spin-hero-sub{
+  font-size:.95rem;color:#8899BB;margin-bottom:28px;line-height:1.5;
+}
+.spin-btn{
+  background:var(--orange);color:var(--white);
+  padding:18px 52px;border-radius:14px;
+  font-size:1.15rem;font-weight:900;border:none;cursor:pointer;
+  font-family:'Montserrat',sans-serif;transition:all .2s;
+  letter-spacing:.04em;text-transform:uppercase;
+  box-shadow:0 8px 32px rgba(232,98,42,.45);
+}
+.spin-btn:hover{
+  background:var(--orange2);transform:translateY(-2px);
+  box-shadow:0 12px 40px rgba(232,98,42,.55);
+}
+.spin-btn:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+
+/* FEATURE PILLS */
+.home-features{
+  display:flex;gap:12px;flex-wrap:wrap;justify-content:center;
+  max-width:680px;width:100%;position:relative;z-index:1;
+}
+.feat-pill{
+  display:flex;align-items:center;gap:8px;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:40px;padding:10px 20px;
+  cursor:pointer;transition:all .2s;
+  color:var(--white);
+}
+.feat-pill:hover{
+  background:rgba(232,98,42,.15);
+  border-color:var(--orange);
+  transform:translateY(-2px);
+}
+.feat-icon{font-size:1rem;}
+.feat-label{font-size:.85rem;font-weight:600;}
 </style>
 </head>
 <body>
@@ -390,37 +471,59 @@ nav{background:var(--navy);position:sticky;top:0;z-index:200;box-shadow:0 2px 16
 
 <!-- HOME PAGE -->
 <div class="page active" id="page-home">
-  <div class="hero">
-    <div class="hero-eyebrow">Faith. Discipline. Consistency.</div>
-    <h1>Study Scripture<br><em>like never before.</em></h1>
-    <p class="hero-sub">AI-powered verse breakdowns, all 66 books of the Bible, study worksheets, and a random verse spinner — all in one place.</p>
-    <div class="hero-actions">
-      <button class="btn btn-primary" onclick="showPage('search')">&#x2728; Search a Verse</button>
-      <button class="btn btn-ghost" onclick="showPage('books')">Browse All 66 Books</button>
+  <!-- FULL HOME HERO WITH SPINNER AS CENTERPIECE -->
+<div class="home-hero">
+  <div class="home-hero-top">
+    <div class="home-eyebrow">Faith. Discipline. Consistency.</div>
+    <h1 class="home-title">The Bible Desk</h1>
+    <p class="home-tagline">Every verse. Every book. Deep enough to change you.</p>
+  </div>
+
+  <!-- SPINNER AS HERO -->
+  <div class="spin-hero">
+    <div class="spin-hero-label">SPIN A VERSE</div>
+    <div class="spin-hero-sub">Hit the button. See what Scripture has for you today.</div>
+
+    <button class="spin-btn" onclick="spinVerse()" id="spin-btn">🎲 Spin a Verse</button>
+
+    <div class="spin-drum-wrap" id="spin-drum-wrap">
+      <div class="spin-drum-label">🎲 Spinning through Scripture...</div>
+      <div class="spin-drum">
+        <div class="spin-drum-track" id="spin-track"></div>
+        <div class="spin-drum-tick left"></div>
+        <div class="spin-drum-tick right"></div>
+      </div>
+      <div class="spin-drum-ref" id="spin-drum-ref"></div>
+    </div>
+
+    <div class="spin-result" id="spin-result">
+      <div class="spin-book-name" id="spin-book"></div>
+      <div class="spin-ref" id="spin-ref-display"></div>
+      <div class="spin-verse" id="spin-verse-text"></div>
+      <button class="spin-ai-btn" onclick="studySpinVerse()">
+        📖 Study This Verse &rarr;
+      </button>
+      <div id="spin-ai-output" style="margin-top:16px;"></div>
     </div>
   </div>
 
-  <!-- SPINNER -->
-  <div class="spinner-section">
-    <div class="section-head">
-      <h2>Random Verse Spinner</h2>
-      <p>Hit the button and get a random verse with a full AI breakdown — perfect for study or content.</p>
+  <!-- FEATURE PILLS -->
+  <div class="home-features">
+    <div class="feat-pill" onclick="showPage('search')">
+      <span class="feat-icon">🔍</span>
+      <span class="feat-label">Search Any Verse or Topic</span>
     </div>
-    <div class="spinner-card">
-      <button class="spin-btn" onclick="spinVerse()" id="spin-btn">🎲 Spin a Verse</button>
-      <div class="spin-drum-wrap" id="spin-drum-wrap"><div class="spin-drum-label">🎲 Spinning through Scripture...</div><div class="spin-drum"><div class="spin-drum-track" id="spin-track"></div><div class="spin-drum-tick left"></div><div class="spin-drum-tick right"></div></div><div class="spin-drum-ref" id="spin-drum-ref"></div></div>
-      <div id="spin-slot" style="display:none;margin-top:20px;overflow:hidden;height:60px;position:relative;">
-        <div id="spin-slot-inner" style="position:absolute;width:100%;transition:none;"></div>
-      </div>
-      <div class="spin-result" id="spin-result">
-        <div class="spin-book-name" id="spin-book"></div>
-        <div class="spin-ref" id="spin-ref-display"></div>
-        <div class="spin-verse" id="spin-verse-text"></div>
-        <button class="spin-ai-btn" onclick="studySpinVerse()">
-          📖 Study This Verse &rarr;
-        </button>
-        <div id="spin-ai-output" style="margin-top:16px;"></div>
-      </div>
+    <div class="feat-pill" onclick="showPage('books')">
+      <span class="feat-icon">📚</span>
+      <span class="feat-label">All 66 Books</span>
+    </div>
+    <div class="feat-pill" onclick="showPage('worksheet')">
+      <span class="feat-icon">✏️</span>
+      <span class="feat-label">Study Worksheets</span>
+    </div>
+    <div class="feat-pill" onclick="showPage('saved')">
+      <span class="feat-icon">🔖</span>
+      <span class="feat-label">Saved Notes</span>
     </div>
   </div>
 </div>
