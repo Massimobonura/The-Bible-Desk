@@ -519,6 +519,7 @@ nav{background:var(--navy);position:sticky;top:0;z-index:200;box-shadow:0 2px 16
     </div>
   </div>
 </div>
+</div>
 
 <!-- SEARCH PAGE -->
 <div class="page" id="page-search">
@@ -691,6 +692,32 @@ let currentSpinRef = '';
 let currentSpinVerse = '';
 
 // ── AUTH ──────────────────────────────────────────────────────────────────────
+// ── TICK SOUND ───────────────────────────────────────────────────────────────
+function playTick() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.frequency.setValueAtTime(900, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(450, ctx.currentTime + 0.035);
+    gain.gain.setValueAtTime(0.12, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.035);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.035);
+  } catch(e) {}
+}
+
+// ── STUDY SPIN VERSE ─────────────────────────────────────────────────────────
+async function studySpinVerse() {
+  if (!currentUser) {
+    openAuthModal('Unlock Full Study Breakdown', 'Create a free account to get deep breakdowns on any verse or topic.');
+    return;
+  }
+  await getAIBreakdown(currentSpinRef, currentSpinVerse, 'spin-ai-output');
+}
+
 async function initAuth() {
   const { data: { session } } = await sb.auth.getSession();
   if (session) setUser(session.user);
@@ -821,6 +848,11 @@ function spinVerse() {
 
     const centerIdx = Math.round(currentOffset / ITEM_H) + PAD;
     const items = track.querySelectorAll('.spin-drum-item');
+    // Play tick sound when center item changes
+    if (typeof lastCenterIdx !== 'undefined' && centerIdx !== lastCenterIdx && progress < 0.9) {
+      playTick();
+    }
+    lastCenterIdx = centerIdx;
     items.forEach(function(el, i) {
       el.classList.toggle('active', i === centerIdx);
       el.classList.toggle('near', i === centerIdx - 1 || i === centerIdx + 1);
