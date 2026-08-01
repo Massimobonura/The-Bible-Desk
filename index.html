@@ -1516,14 +1516,11 @@ Pick the 3 most relevant verses. Use accurate verse text. Keep notes under 15 wo
 async function studyThisVerse() {
   const query = currentSearchQuery;
 
-  // Check if user is subscribed (for now check if logged in - subscription check comes later)
-  if (!currentUser) {
-    openAuthModal('Unlock Full Study Breakdown', 'Create a free account and subscribe to unlock unlimited deep dives on any verse or topic.');
-    return;
-  }
+  // Check free usage limit first
+  if (!checkUsageLimit()) return;
+  incrementUsage();
+  updateUsageBadge();
 
-  // TODO: Check subscription status here when Stripe is connected
-  // For now, logged in users get access
   const fullEl = document.getElementById('search-result');
   const titleEl = document.getElementById('search-result-title');
   const bodyEl = document.getElementById('search-result-body');
