@@ -438,6 +438,56 @@ nav{background:var(--navy);position:sticky;top:0;z-index:200;box-shadow:0 2px 16
 }
 .feat-icon{font-size:1rem;}
 .feat-label{font-size:.85rem;font-weight:600;}
+
+/* ── STUDY PLANS ── */
+.plans-wrap{max-width:780px;margin:0 auto;padding:40px 24px 60px;}
+.plan-step{margin-bottom:28px;}
+.plan-step-label{font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:.12em;color:var(--orange);margin-bottom:14px;}
+.plan-type-toggle{display:flex;gap:10px;margin-bottom:20px;}
+.plan-type-btn{padding:10px 24px;border-radius:8px;border:2px solid var(--border);background:var(--white);font-size:.9rem;font-weight:700;color:var(--navy);cursor:pointer;font-family:"Inter",sans-serif;transition:all .18s;}
+.plan-type-btn.active{background:var(--navy);color:var(--white);border-color:var(--navy);}
+.topic-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;}
+.topic-chip{padding:12px 16px;border-radius:10px;border:1.5px solid var(--border);background:var(--white);font-size:.88rem;font-weight:600;color:var(--navy);cursor:pointer;transition:all .18s;}
+.topic-chip:hover{border-color:var(--orange);color:var(--orange);}
+.topic-chip.selected{background:var(--navy);color:var(--white);border-color:var(--navy);}
+.plan-book-select{width:100%;padding:13px 16px;border:2px solid var(--border);border-radius:10px;font-size:.95rem;font-family:"Inter",sans-serif;outline:none;color:var(--navy);background:var(--white);}
+.plan-book-select:focus{border-color:var(--orange);}
+.plan-length-options{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.plan-length-card{padding:20px;border-radius:12px;border:2px solid var(--border);background:var(--white);text-align:center;cursor:pointer;transition:all .2s;}
+.plan-length-card:hover{border-color:var(--orange);}
+.plan-length-card.selected{background:var(--navy);border-color:var(--navy);}
+.plan-length-num{font-size:2rem;font-weight:900;color:var(--navy);font-family:"Montserrat",sans-serif;}
+.plan-length-card.selected .plan-length-num{color:var(--white);}
+.plan-length-label{font-size:.85rem;font-weight:700;color:var(--muted);}
+.plan-length-card.selected .plan-length-label{color:rgba(255,255,255,.7);}
+.plan-length-sub{font-size:.75rem;color:var(--muted);margin-top:4px;}
+.plan-length-card.selected .plan-length-sub{color:rgba(255,255,255,.5);}
+.plan-summary{background:var(--warm);border-radius:10px;padding:14px 18px;font-size:.9rem;color:var(--navy);font-weight:600;margin-bottom:14px;border-left:3px solid var(--orange);}
+.plan-day-card{background:var(--white);border:1.5px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:12px;transition:box-shadow .2s;}
+.plan-day-card:hover{box-shadow:0 4px 16px rgba(27,42,74,.08);}
+.plan-day-card.completed{border-color:#48BB78;opacity:.8;}
+.plan-day-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;cursor:pointer;}
+.plan-day-num{display:flex;align-items:center;gap:10px;}
+.plan-day-badge{width:32px;height:32px;border-radius:8px;background:var(--navy);color:var(--white);font-size:.75rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.plan-day-card.completed .plan-day-badge{background:#48BB78;}
+.plan-day-title{font-weight:700;color:var(--navy);font-size:.95rem;}
+.plan-day-ref{font-size:.8rem;color:var(--orange);font-weight:600;}
+.plan-day-body{display:none;padding:0 18px 18px;border-top:1px solid var(--border);}
+.plan-day-card.open .plan-day-body{display:block;}
+.plan-day-verse{background:var(--warm);border-left:3px solid var(--orange);padding:12px 16px;border-radius:0 8px 8px 0;font-size:.95rem;color:var(--navy);line-height:1.65;margin:14px 0 10px;font-style:italic;}
+.plan-day-question{font-size:.9rem;color:var(--black);line-height:1.6;margin-bottom:14px;}
+.plan-day-question strong{color:var(--navy);}
+.plan-complete-btn{background:var(--warm);color:var(--navy);border:1.5px solid var(--border);padding:8px 18px;border-radius:8px;font-size:.82rem;font-weight:700;cursor:pointer;font-family:"Inter",sans-serif;transition:all .2s;}
+.plan-complete-btn:hover{background:#48BB78;color:var(--white);border-color:#48BB78;}
+.plan-complete-btn.done{background:#48BB78;color:var(--white);border-color:#48BB78;}
+.saved-plan-card{background:var(--white);border:1.5px solid var(--border);border-radius:12px;padding:18px;cursor:pointer;transition:all .2s;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;}
+.saved-plan-card:hover{border-color:var(--orange);}
+.saved-plan-info h4{font-size:1rem;font-weight:700;color:var(--navy);margin-bottom:4px;}
+.saved-plan-info p{font-size:.8rem;color:var(--muted);}
+.saved-plan-progress{text-align:right;}
+.progress-bar{width:80px;height:6px;background:var(--border);border-radius:3px;margin-bottom:4px;}
+.progress-fill{height:100%;border-radius:3px;background:var(--orange);}
+.progress-text{font-size:.72rem;color:var(--muted);}
 </style>
 </head>
 <body>
@@ -453,6 +503,7 @@ nav{background:var(--navy);position:sticky;top:0;z-index:200;box-shadow:0 2px 16
         <span class="nav-tab" onclick="showPage('books')" id="tab-books">66 Books</span>
         <span class="nav-tab" onclick="showPage('worksheet')" id="tab-worksheet">Worksheet</span>
         <span class="nav-tab" onclick="showPage('saved')" id="tab-saved">Saved</span>
+        <span class="nav-tab" onclick="showPage('plans')" id="tab-plans">Study Plans</span>
       </div>
       <div id="auth-area">
         <button class="nav-btn primary" onclick="openAuthModal()">Sign in</button>
@@ -692,10 +743,246 @@ let currentSpinRef = '';
 let currentSpinVerse = '';
 
 // ── AUTH ──────────────────────────────────────────────────────────────────────
+
+// ── STUDY PLANS ──────────────────────────────────────────────────────────────
+let planType = 'topic';
+let planTopic = '';
+let planLength = 0;
+let currentPlan = null;
+
+function setPlanType(type) {
+  planType = type;
+  planTopic = '';
+  planLength = 0;
+  document.getElementById('btn-type-topic').classList.toggle('active', type === 'topic');
+  document.getElementById('btn-type-book').classList.toggle('active', type === 'book');
+  document.getElementById('topic-grid').style.display = type === 'topic' ? 'grid' : 'none';
+  document.getElementById('book-selector').style.display = type === 'book' ? 'block' : 'none';
+  document.querySelectorAll('.topic-chip').forEach(c => c.classList.remove('selected'));
+  document.querySelectorAll('.plan-length-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('plan-step-2').style.display = 'none';
+  document.getElementById('plan-generate-wrap').style.display = 'none';
+  document.getElementById('plan-output').style.display = 'none';
+}
+
+function selectTopic(el, topic) {
+  planTopic = topic;
+  document.querySelectorAll('.topic-chip').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('plan-step-2').style.display = 'block';
+  document.getElementById('plan-step-2').scrollIntoView({behavior:'smooth',block:'nearest'});
+  checkShowGenerate();
+}
+
+function selectBook(val) {
+  planTopic = val;
+  if (val) {
+    document.getElementById('plan-step-2').style.display = 'block';
+    document.getElementById('plan-step-2').scrollIntoView({behavior:'smooth',block:'nearest'});
+  }
+  checkShowGenerate();
+}
+
+function selectLength(el, days) {
+  planLength = days;
+  document.querySelectorAll('.plan-length-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  checkShowGenerate();
+}
+
+function checkShowGenerate() {
+  const wrap = document.getElementById('plan-generate-wrap');
+  const summary = document.getElementById('plan-summary');
+  if (planTopic && planLength) {
+    const typeLabel = planType === 'topic' ? 'Topic' : 'Book';
+    summary.textContent = planLength + '-Day Study Plan — ' + typeLabel + ': ' + planTopic;
+    wrap.style.display = 'block';
+    wrap.scrollIntoView({behavior:'smooth',block:'nearest'});
+  } else {
+    wrap.style.display = 'none';
+  }
+}
+
+async function generatePlan() {
+  if (!currentUser) {
+    openAuthModal('Sign in to Generate a Study Plan', 'Create a free account to build and save personal study plans.');
+    return;
+  }
+
+  const btn = document.getElementById('generate-btn');
+  const output = document.getElementById('plan-output');
+  btn.textContent = '⏳ Generating your plan...';
+  btn.disabled = true;
+  output.style.display = 'block';
+  output.innerHTML = '<div class="ai-loading"><div class="loader"></div><p>Building your ' + planLength + '-day plan on ' + planTopic + '...</p></div>';
+
+  const prompt = `You are a Bible scholar creating a personal study plan.
+
+Topic/Book: "${planTopic}"
+Plan length: ${planLength} days
+
+Create a ${planLength}-day Bible study plan. Return ONLY a raw JSON object, no markdown, no backticks:
+
+{
+  "title": "Short inspiring plan title",
+  "description": "One sentence describing what this plan will do for the reader.",
+  "days": [
+    {
+      "day": 1,
+      "title": "Short day title",
+      "verse_ref": "Book Chapter:Verse",
+      "verse_text": "Full accurate verse text",
+      "reflection": "A thoughtful reflection question that helps the reader apply this verse personally. Should be specific and introspective."
+    }
+  ]
+}
+
+Make all ${planLength} days. Use accurate verse text. Make each day build on the previous. Keep titles under 6 words. Make reflection questions personal and practical.`;
+
+  try {
+    const text = await callClaude(prompt);
+    let clean = text.trim().replace(/^```json\s*/i,'').replace(/```\s*$/i,'');
+    const start = clean.indexOf('{');
+    const end = clean.lastIndexOf('}');
+    clean = clean.slice(start, end+1);
+    const data = JSON.parse(clean);
+
+    currentPlan = data;
+    currentPlan.topic = planTopic;
+    currentPlan.type = planType;
+    currentPlan.length = planLength;
+    currentPlan.completed_days = [];
+    currentPlan.created_at = new Date().toISOString();
+
+    renderPlan(data, output);
+    btn.textContent = '✨ Generate My Study Plan';
+    btn.disabled = false;
+
+    // Save to Supabase
+    savePlanToSupabase(currentPlan);
+
+  } catch(e) {
+    console.error('Plan generation error:', e);
+    output.innerHTML = '<p style="color:#e53e3e;padding:20px;">Could not generate plan. Please try again.</p>';
+    btn.textContent = '✨ Generate My Study Plan';
+    btn.disabled = false;
+  }
+}
+
+function renderPlan(data, container) {
+  let html = '<div style="margin-bottom:24px;">';
+  html += '<h3 style="font-family:Montserrat,sans-serif;font-size:1.4rem;color:var(--navy);margin-bottom:8px;">' + data.title + '</h3>';
+  html += '<p style="color:var(--muted);font-size:.9rem;margin-bottom:20px;">' + data.description + '</p>';
+  html += '</div>';
+
+  data.days.forEach(function(day) {
+    const isCompleted = currentPlan && currentPlan.completed_days && currentPlan.completed_days.includes(day.day);
+    html += '<div class="plan-day-card' + (isCompleted?' completed':'') + '" id="plan-day-' + day.day + '">';
+    html += '<div class="plan-day-header" onclick="togglePlanDay(' + day.day + ')">';
+    html += '<div class="plan-day-num">';
+    html += '<div class="plan-day-badge">' + (isCompleted ? '✓' : day.day) + '</div>';
+    html += '<div><div class="plan-day-title">' + day.title + '</div><div class="plan-day-ref">' + day.verse_ref + '</div></div>';
+    html += '</div>';
+    html += '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7A7570" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>';
+    html += '</div>';
+    html += '<div class="plan-day-body">';
+    html += '<div class="plan-day-verse">"' + day.verse_text + '"</div>';
+    html += '<div class="plan-day-question"><strong>Reflection:</strong> ' + day.reflection + '</div>';
+    html += '<button class="plan-complete-btn' + (isCompleted?' done':'') + '" onclick="markDayComplete(' + day.day + ')">' + (isCompleted ? '✓ Completed' : 'Mark Complete') + '</button>';
+    html += '</div></div>';
+  });
+
+  container.innerHTML = html;
+}
+
+function togglePlanDay(dayNum) {
+  const card = document.getElementById('plan-day-' + dayNum);
+  card.classList.toggle('open');
+}
+
+function markDayComplete(dayNum) {
+  if (!currentPlan) return;
+  if (!currentPlan.completed_days.includes(dayNum)) {
+    currentPlan.completed_days.push(dayNum);
+    updatePlanInSupabase(currentPlan);
+    const output = document.getElementById('plan-output');
+    if (output) renderPlan(currentPlan, output);
+    showToast('Day ' + dayNum + ' complete! 🙌', 'success');
+  }
+}
+
+async function savePlanToSupabase(plan) {
+  if (!currentUser) return;
+  const { error } = await sb.from('study_plans').insert([{
+    user_id: currentUser.id,
+    title: plan.title,
+    description: plan.description,
+    topic: plan.topic,
+    plan_type: plan.type,
+    length: plan.length,
+    days_data: JSON.stringify(plan.days),
+    completed_days: JSON.stringify(plan.completed_days),
+    created_at: plan.created_at
+  }]);
+  if (!error) {
+    showToast('Plan saved!', 'success');
+    loadMyPlans();
+  }
+}
+
+async function updatePlanInSupabase(plan) {
+  if (!currentUser || !plan.id) return;
+  await sb.from('study_plans').update({
+    completed_days: JSON.stringify(plan.completed_days)
+  }).eq('id', plan.id);
+}
+
+async function loadMyPlans() {
+  if (!currentUser) return;
+  const section = document.getElementById('my-plans-section');
+  const list = document.getElementById('my-plans-list');
+  const { data, error } = await sb.from('study_plans')
+    .select('*').eq('user_id', currentUser.id)
+    .order('created_at', {ascending: false});
+
+  if (!data || data.length === 0) { section.style.display = 'none'; return; }
+  section.style.display = 'block';
+
+  list.innerHTML = data.map(function(plan) {
+    const completed = JSON.parse(plan.completed_days || '[]').length;
+    const total = plan.length;
+    const pct = Math.round((completed / total) * 100);
+    return '<div class="saved-plan-card" onclick="openSavedPlan(' + JSON.stringify(plan).replace(/"/g,'&quot;') + ')">' +
+      '<div class="saved-plan-info"><h4>' + plan.title + '</h4><p>' + plan.length + '-day plan on ' + plan.topic + '</p></div>' +
+      '<div class="saved-plan-progress"><div class="progress-bar"><div class="progress-fill" style="width:' + pct + '%"></div></div>' +
+      '<div class="progress-text">' + completed + '/' + total + ' days</div></div></div>';
+  }).join('');
+}
+
+function openSavedPlan(plan) {
+  plan.days = JSON.parse(plan.days_data);
+  plan.completed_days = JSON.parse(plan.completed_days || '[]');
+  currentPlan = plan;
+  const output = document.getElementById('plan-output');
+  output.style.display = 'block';
+  renderPlan(plan, output);
+  output.scrollIntoView({behavior:'smooth'});
+}
+
 // ── TICK SOUND ───────────────────────────────────────────────────────────────
+let _audioCtx = null;
+function getAudioCtx() {
+  if (!_audioCtx) {
+    _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (_audioCtx.state === 'suspended') {
+    _audioCtx.resume();
+  }
+  return _audioCtx;
+}
 function playTick() {
   try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const ctx = getAudioCtx();
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
     osc.connect(gain);
@@ -758,6 +1045,19 @@ async function signOut() {
   await sb.auth.signOut();
 }
 
+function updatePlansGate() {
+  const gate = document.getElementById('plans-gate');
+  const builder = document.getElementById('plans-builder');
+  if (!gate || !builder) return;
+  if (currentUser) {
+    gate.innerHTML = '';
+    builder.style.display = 'block';
+  } else {
+    gate.innerHTML = '<div class="auth-gate"><h3>Sign in to create study plans</h3><p>Create a free account to build personalized Bible study plans.</p><button class="btn btn-primary" onclick="openAuthModal()" style="margin-top:16px;">Sign in</button></div>';
+    builder.style.display = 'none';
+  }
+}
+
 function updateAuthGates() {
   // Worksheet is open to everyone - auth only required at save time
   // Update saved page if it is currently active
@@ -776,6 +1076,7 @@ function showPage(name) {
   if (tab) tab.classList.add('active');
   if (name === 'books') renderBooks();
   if (name === 'saved' && currentUser) loadSavedWorksheets();
+  if (name === 'plans') { updatePlansGate(); loadMyPlans(); }
   window.scrollTo(0, 0);
 }
 
@@ -799,6 +1100,7 @@ function spinVerse() {
   btn.disabled = true;
   btn.textContent = '⏳ Spinning...';
   btn.classList.add('spinning');
+  getAudioCtx(); // Wake up audio context on user gesture
   drumWrap.style.display = 'block';
   drumRef.classList.remove('show');
   result.classList.remove('show');
@@ -1352,6 +1654,124 @@ initAuth();
 clearWorksheet();
 updateAuthGates();
 </script>
+
+
+<!-- STUDY PLANS PAGE -->
+<div class="page" id="page-plans">
+  <div class="plans-wrap">
+    <div class="section-head" style="margin-bottom:32px;">
+      <h2>Personal Study Plans</h2>
+      <p>Choose a topic or Bible book and get a personalized daily study plan with verses and reflection questions.</p>
+    </div>
+
+    <div id="plans-gate"></div>
+
+    <div id="plans-builder">
+      <!-- Step 1: Topic or Book -->
+      <div class="plan-step" id="plan-step-1">
+        <div class="plan-step-label">Step 1 — What do you want to study?</div>
+        <div class="plan-type-toggle">
+          <button class="plan-type-btn active" id="btn-type-topic" onclick="setPlanType('topic')">By Topic</button>
+          <button class="plan-type-btn" id="btn-type-book" onclick="setPlanType('book')">By Bible Book</button>
+        </div>
+
+        <!-- Topic grid -->
+        <div id="topic-grid" class="topic-grid">
+          <div class="topic-chip" onclick="selectTopic(this, 'Anxiety & Fear')">😰 Anxiety &amp; Fear</div>
+          <div class="topic-chip" onclick="selectTopic(this, 'Faith')">✝️ Faith</div>
+          <div class="topic-chip" onclick="selectTopic(this, 'Relationships & Dating')">❤️ Relationships &amp; Dating</div>
+          <div class="topic-chip" onclick="selectTopic(this, 'Identity in Christ')">🙌 Identity in Christ</div>
+          <div class="topic-chip" onclick="selectTopic(this, 'Money & Wealth')">💰 Money &amp; Wealth</div>
+          <div class="topic-chip" onclick="selectTopic(this, 'Prayer')">🙏 Prayer</div>
+          <div class="topic-chip" onclick="selectTopic(this, 'Forgiveness')">🕊️ Forgiveness</div>
+          <div class="topic-chip" onclick="selectTopic(this, 'Purpose & Calling')">🎯 Purpose &amp; Calling</div>
+          <div class="topic-chip" onclick="selectTopic(this, 'Lust & Sexual Purity')">🔥 Lust &amp; Sexual Purity</div>
+          <div class="topic-chip" onclick="selectTopic(this, 'Anger & Conflict')">⚡ Anger &amp; Conflict</div>
+          <div class="topic-chip" onclick="selectTopic(this, 'Grief & Loss')">💔 Grief &amp; Loss</div>
+          <div class="topic-chip" onclick="selectTopic(this, 'Courage & Strength')">💪 Courage &amp; Strength</div>
+          <div class="topic-chip" onclick="selectTopic(this, 'Temptation')">⚔️ Temptation</div>
+          <div class="topic-chip" onclick="selectTopic(this, 'Humility')">🌿 Humility</div>
+          <div class="topic-chip" onclick="selectTopic(this, 'Hope')">⭐ Hope</div>
+          <div class="topic-chip" onclick="selectTopic(this, 'Worship')">🎵 Worship</div>
+        </div>
+
+        <!-- Book selector -->
+        <div id="book-selector" style="display:none;">
+          <select class="plan-book-select" id="plan-book-select" onchange="selectBook(this.value)">
+            <option value="">-- Choose a Book --</option>
+            <optgroup label="Old Testament">
+              <option>Genesis</option><option>Exodus</option><option>Leviticus</option>
+              <option>Numbers</option><option>Deuteronomy</option><option>Joshua</option>
+              <option>Judges</option><option>Ruth</option><option>1 Samuel</option>
+              <option>2 Samuel</option><option>1 Kings</option><option>2 Kings</option>
+              <option>1 Chronicles</option><option>2 Chronicles</option><option>Ezra</option>
+              <option>Nehemiah</option><option>Esther</option><option>Job</option>
+              <option>Psalms</option><option>Proverbs</option><option>Ecclesiastes</option>
+              <option>Song of Solomon</option><option>Isaiah</option><option>Jeremiah</option>
+              <option>Lamentations</option><option>Ezekiel</option><option>Daniel</option>
+              <option>Hosea</option><option>Joel</option><option>Amos</option>
+              <option>Obadiah</option><option>Jonah</option><option>Micah</option>
+              <option>Nahum</option><option>Habakkuk</option><option>Zephaniah</option>
+              <option>Haggai</option><option>Zechariah</option><option>Malachi</option>
+            </optgroup>
+            <optgroup label="New Testament">
+              <option>Matthew</option><option>Mark</option><option>Luke</option>
+              <option>John</option><option>Acts</option><option>Romans</option>
+              <option>1 Corinthians</option><option>2 Corinthians</option><option>Galatians</option>
+              <option>Ephesians</option><option>Philippians</option><option>Colossians</option>
+              <option>1 Thessalonians</option><option>2 Thessalonians</option><option>1 Timothy</option>
+              <option>2 Timothy</option><option>Titus</option><option>Philemon</option>
+              <option>Hebrews</option><option>James</option><option>1 Peter</option>
+              <option>2 Peter</option><option>1 John</option><option>2 John</option>
+              <option>3 John</option><option>Jude</option><option>Revelation</option>
+            </optgroup>
+          </select>
+        </div>
+      </div>
+
+      <!-- Step 2: Plan Length -->
+      <div class="plan-step" id="plan-step-2" style="display:none;">
+        <div class="plan-step-label">Step 2 — How long is your plan?</div>
+        <div class="plan-length-options">
+          <div class="plan-length-card" onclick="selectLength(this, 7)">
+            <div class="plan-length-num">7</div>
+            <div class="plan-length-label">Days</div>
+            <div class="plan-length-sub">A week of focus</div>
+          </div>
+          <div class="plan-length-card" onclick="selectLength(this, 14)">
+            <div class="plan-length-num">14</div>
+            <div class="plan-length-label">Days</div>
+            <div class="plan-length-sub">Two weeks deep</div>
+          </div>
+          <div class="plan-length-card" onclick="selectLength(this, 30)">
+            <div class="plan-length-num">30</div>
+            <div class="plan-length-label">Days</div>
+            <div class="plan-length-sub">A month transformed</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Generate button -->
+      <div id="plan-generate-wrap" style="display:none;margin-top:24px;">
+        <div class="plan-summary" id="plan-summary"></div>
+        <button class="ws-save-btn" style="width:100%;padding:16px;font-size:1rem;" onclick="generatePlan()" id="generate-btn">
+          ✨ Generate My Study Plan
+        </button>
+      </div>
+
+      <!-- Generated plan output -->
+      <div id="plan-output" style="display:none;margin-top:32px;"></div>
+    </div>
+
+    <!-- Saved plans -->
+    <div id="my-plans-section" style="margin-top:48px;display:none;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <h3 style="font-family:'Montserrat',sans-serif;font-size:1.2rem;color:var(--navy);">My Study Plans</h3>
+      </div>
+      <div id="my-plans-list"></div>
+    </div>
+  </div>
+</div>
 
 <!-- AUTH MODAL -->
 <div class="auth-modal-overlay" id="auth-modal-overlay">
