@@ -505,6 +505,7 @@ nav{background:var(--navy);position:sticky;top:0;z-index:200;box-shadow:0 2px 16
         <span class="nav-tab" onclick="showPage('saved')" id="tab-saved">Saved</span>
         <span class="nav-tab" onclick="showPage('plans')" id="tab-plans">Study Plans</span>
       </div>
+      <div id="usage-badge" style="font-size:.75rem;color:#8899BB;display:none;"></div>
       <div id="auth-area">
         <button class="nav-btn primary" onclick="openAuthModal()">Sign in</button>
       </div>
@@ -969,6 +970,61 @@ function openSavedPlan(plan) {
   output.scrollIntoView({behavior:'smooth'});
 }
 
+
+// ── FREE USAGE TRACKING ───────────────────────────────────────────────────────
+const FREE_DAILY_LIMIT = 5;
+
+function getTodayKey() {
+  return 'bd_usage_' + new Date().toISOString().slice(0, 10);
+}
+
+function getUsageCount() {
+  // Paid subscribers have unlimited access
+  if (currentUser && isSubscribed()) return 0;
+  return parseInt(localStorage.getItem(getTodayKey()) || '0');
+}
+
+function incrementUsage() {
+  const key = getTodayKey();
+  const current = parseInt(localStorage.getItem(key) || '0');
+  localStorage.setItem(key, current + 1);
+  return current + 1;
+}
+
+function isSubscribed() {
+  // TODO: check Stripe subscription status from Supabase
+  // For now return false - will update when Stripe is connected
+  return false;
+}
+
+function checkUsageLimit() {
+  // Subscribers always pass
+  if (currentUser && isSubscribed()) return true;
+  const count = getUsageCount();
+  if (count >= FREE_DAILY_LIMIT) {
+    showPaywall();
+    return false;
+  }
+  return true;
+}
+
+function showPaywall() {
+  const count = getUsageCount();
+  openAuthModal(
+    "You've used your 5 free studies today",
+    currentUser
+      ? "Upgrade to The Bible Desk for unlimited daily breakdowns, study plans, saved notes, and more."
+      : "Sign in and upgrade to unlock unlimited daily breakdowns, study plans, saved notes, and more."
+  );
+}
+
+function getUsageBadge() {
+  if (currentUser && isSubscribed()) return '';
+  const count = getUsageCount();
+  const remaining = Math.max(0, FREE_DAILY_LIMIT - count);
+  return remaining + ' free ' + (remaining === 1 ? 'study' : 'studies') + ' left today';
+}
+
 // ── TICK SOUND ───────────────────────────────────────────────────────────────
 let _audioCtx = null;
 function getAudioCtx() {
@@ -997,11 +1053,10 @@ function playTick() {
 }
 
 // ── STUDY SPIN VERSE ─────────────────────────────────────────────────────────
-async function studySpinVerse() {
-  if (!currentUser) {
-    openAuthModal('Unlock Full Study Breakdown', 'Create a free account to get deep breakdowns on any verse or topic.');
-    return;
-  }
+async async function studySpinVerse() {
+  if (!checkUsageLimit()) return;
+  incrementUsage();
+  updateUsageBadge();
   await getAIBreakdown(currentSpinRef, currentSpinVerse, 'spin-ai-output');
 }
 
@@ -1112,6 +1167,21 @@ async function submitAuth() {
   } else {
     closeAuthModal();
   }
+}
+
+
+function updateUsageBadge() {
+  const badge = document.getElementById('usage-badge');
+  if (!badge) return;
+  if (currentUser && isSubscribed()) {
+    badge.style.display = 'none';
+    return;
+  }
+  const text = getUsageBadge();
+  badge.textContent = text;
+  badge.style.display = 'block';
+  const count = getUsageCount();
+  badge.style.color = count >= FREE_DAILY_LIMIT ? '#E53E3E' : count >= 3 ? '#E8622A' : '#8899BB';
 }
 
 function updatePlansGate() {
@@ -1448,7 +1518,7 @@ async function studyThisVerse() {
 
   // Check if user is subscribed (for now check if logged in - subscription check comes later)
   if (!currentUser) {
-    openAuthModal('Unlock Full Study Breakdown', 'Create a free account and subscribe to get AI-powered deep dives on any verse or topic.');
+    openAuthModal('Unlock Full Study Breakdown', 'Create a free account and subscribe to unlock unlimited deep dives on any verse or topic.');
     return;
   }
 
@@ -1720,6 +1790,7 @@ function showToast(msg, type='success') {
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 initAuth();
+updateUsageBadge();
 
 // Close auth modal on overlay click
 const authOverlay = document.getElementById('auth-modal-overlay');
