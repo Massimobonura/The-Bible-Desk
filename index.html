@@ -488,6 +488,92 @@ nav{background:var(--navy);position:sticky;top:0;z-index:200;box-shadow:0 2px 16
 .progress-bar{width:80px;height:6px;background:var(--border);border-radius:3px;margin-bottom:4px;}
 .progress-fill{height:100%;border-radius:3px;background:var(--orange);}
 .progress-text{font-size:.72rem;color:var(--muted);}
+
+/* ── BREAKDOWN OUTPUT ON HOME PAGE ── */
+#spin-ai-output {
+  background: var(--white);
+  border-radius: 14px;
+  overflow: hidden;
+  margin-top: 20px;
+  text-align: left;
+  box-shadow: 0 8px 32px rgba(0,0,0,.3);
+}
+#spin-ai-output .ai-section {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+#spin-ai-output .ai-section:last-child { border-bottom: none; }
+#spin-ai-output .ai-section-label {
+  font-size: .7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  color: var(--orange);
+  margin-bottom: 8px;
+}
+#spin-ai-output .ai-section-text {
+  font-size: .9rem;
+  line-height: 1.7;
+  color: var(--black);
+}
+.spin-result {
+  margin-top: 24px;
+  text-align: left;
+}
+.spin-verse {
+  background: rgba(255,255,255,.08) !important;
+  border-left: 3px solid var(--orange) !important;
+  border-radius: 0 8px 8px 0;
+  padding: 14px 18px !important;
+  font-size: 1rem !important;
+  color: var(--white) !important;
+  line-height: 1.65;
+  margin-bottom: 8px;
+}
+.spin-book-name {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--white);
+  margin-bottom: 4px;
+  font-family: 'Montserrat', sans-serif;
+}
+.spin-ref {
+  font-size: .75rem;
+  font-weight: 700;
+  color: var(--orange);
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  margin-bottom: 14px;
+}
+.spin-ai-btn {
+  width: 100%;
+  background: var(--orange);
+  color: var(--white);
+  padding: 13px 22px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-size: .95rem;
+  font-weight: 700;
+  font-family: 'Inter', sans-serif;
+  transition: background .2s;
+  margin-top: 4px;
+}
+.spin-ai-btn:hover { background: var(--orange2); }
+
+/* Full breakdown header when shown on home */
+.breakdown-header {
+  background: var(--navy);
+  padding: 14px 20px;
+  border-radius: 14px 14px 0 0;
+}
+.breakdown-header-title {
+  font-size: .8rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  color: var(--orange);
+}
 </style>
 </head>
 <body>
@@ -1355,17 +1441,19 @@ function parseBreakdown(text) {
   return sections.length > 1 ? sections : [{ heading: 'Breakdown', body: text }];
 }
 
-function renderBreakdown(sections) {
-  return sections.map(s => `
+function renderBreakdown(sections, title) {
+  const header = title ? `<div class="breakdown-header"><div class="breakdown-header-title">${title} — Deep Dive Breakdown</div></div>` : '';
+  const body = sections.map(s => `
     <div class="ai-section">
       <div class="ai-section-label">${s.heading}</div>
       <div class="ai-section-text">${s.body.replace(/\n/g,'<br>')}</div>
     </div>`).join('');
+  return header + body;
 }
 
 async function getAIBreakdown(ref, verseText, outputId) {
   const container = document.getElementById(outputId);
-  container.innerHTML = '<div class="ai-loading"><div class="loader"></div><p>Getting breakdown...</p></div>';
+  container.innerHTML = '<div class="ai-loading" style="background:var(--white);border-radius:14px;"><div class="loader"></div><p>Getting breakdown...</p></div>';
 
   const prompt = `You are a Bible scholar providing a deep, accessible breakdown for someone studying Scripture.
 
@@ -1384,9 +1472,9 @@ Keep each section 2-4 sentences. Be specific, insightful, and practical. Write f
   try {
     const text = await callClaude(prompt);
     const sections = parseBreakdown(text);
-    container.innerHTML = renderBreakdown(sections);
+    container.innerHTML = renderBreakdown(sections, ref);
   } catch(e) {
-    container.innerHTML = '<p style="color:#e53e3e;font-size:.9rem;">Could not load breakdown. Please try again.</p>';
+    container.innerHTML = '<p style="color:#e53e3e;font-size:.9rem;padding:20px;">Could not load breakdown. Please try again.</p>';
   }
 }
 
