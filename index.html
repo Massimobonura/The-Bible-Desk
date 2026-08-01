@@ -578,7 +578,7 @@ nav{background:var(--navy);position:sticky;top:0;z-index:200;box-shadow:0 2px 16
   <div class="search-section">
     <div class="section-head" style="margin-bottom:24px;">
       <h2>Verse & Topic Search</h2>
-      <p>Search any verse, topic, or Bible concept for a full AI-powered breakdown.</p>
+      <p>Search any verse, topic, or Bible concept for a full deep breakdown.</p>
     </div>
     <div class="search-box">
       <input type="text" class="search-input" id="search-input" placeholder="e.g. John 3:16, faith, the Sermon on the Mount..." onkeydown="if(event.key==='Enter')doSearch()">
@@ -1053,7 +1053,7 @@ function playTick() {
 }
 
 // ── STUDY SPIN VERSE ─────────────────────────────────────────────────────────
-async async function studySpinVerse() {
+async function studySpinVerse() {
   if (!checkUsageLimit()) return;
   incrementUsage();
   updateUsageBadge();
