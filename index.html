@@ -51,15 +51,7 @@ nav{background:var(--navy);position:sticky;top:0;z-index:200;box-shadow:0 2px 16
 .btn-ghost:hover{border-color:var(--orange);color:var(--orange);}
 
 /* spinner-section replaced by spin-hero */
-@keyframes slotSpin {
-  0%{transform:translateY(0);}
-  100%{transform:translateY(-100%);}
-}
-.spin-slot-item{
-  height:60px;display:flex;align-items:center;justify-content:center;
-  font-family:'Libre Baskerville',serif;font-size:1rem;color:var(--navy);
-  font-style:normal;padding:0 20px;text-align:center;
-}
+
 
 .spin-drum-wrap{display:none;margin:32px auto 0;width:100%;max-width:680px;position:relative;}
 .spin-drum-label{
@@ -763,16 +755,12 @@ function showPage(name) {
 // ── SPINNER ───────────────────────────────────────────────────────────────────
 function spinVerse() {
   const btn = document.getElementById('spin-btn');
-  const slot = document.getElementById('spin-slot');
-  const slotInner = document.getElementById('spin-slot-inner');
+  const drumWrap = document.getElementById('spin-drum-wrap');
+  const track = document.getElementById('spin-track');
+  const drumRef = document.getElementById('spin-drum-ref');
   const result = document.getElementById('spin-result');
 
-  btn.disabled = true;
-  btn.textContent = '🎲 Spinning...';
-  slot.style.display = 'block';
-  result.classList.remove('show');
-
-  // Pick the final verse
+  // Build verse pool
   const allVerses = [];
   BOOKS.forEach(book => {
     book.key_verses.forEach(v => {
@@ -781,64 +769,87 @@ function spinVerse() {
   });
   const finalPick = allVerses[Math.floor(Math.random() * allVerses.length)];
 
-  // Build slot items - cycle through random verses then land on final
-  let items = '';
-  for (let i = 0; i < 12; i++) {
-    const pick = allVerses[Math.floor(Math.random() * allVerses.length)];
-    items += `<div class="spin-slot-item">${pick.ref} — "${pick.text.slice(0,60)}..."</div>`;
-  }
-  items += `<div class="spin-slot-item">${finalPick.ref} — "${finalPick.text.slice(0,60)}..."</div>`;
-  slotInner.innerHTML = items;
-  slotInner.style.transition = 'none';
-  slotInner.style.transform = 'translateY(0)';
+  btn.disabled = true;
+  btn.textContent = '⏳ Spinning...';
+  btn.classList.add('spinning');
+  drumWrap.style.display = 'block';
+  drumRef.classList.remove('show');
+  result.classList.remove('show');
+  document.getElementById('spin-ai-output').innerHTML = '';
 
-  // Animate scrolling
-  let step = 0;
-  const totalSteps = 12;
-  const interval = setInterval(() => {
-    step++;
-    const speed = step < 8 ? 80 : step < 11 ? 180 : 300;
-    slotInner.style.transition = `transform ${speed}ms ease`;
-    slotInner.style.transform = `translateY(-${step * 60}px)`;
-    if (step >= totalSteps) {
-      clearInterval(interval);
-      setTimeout(() => {
-        slot.style.display = 'none';
+  const ITEM_H = 68;
+  const VISIBLE = 5;
+  const PAD = Math.floor(VISIBLE / 2);
+  const TOTAL = 40;
+
+  let html = '';
+  for (let i = 0; i < PAD; i++) {
+    html += '<div class="spin-drum-item"></div>';
+  }
+  for (let i = 0; i < TOTAL; i++) {
+    const p = allVerses[Math.floor(Math.random() * allVerses.length)];
+    const short = p.text.length > 60 ? p.text.slice(0, 60) + '...' : p.text;
+    html += '<div class="spin-drum-item">' + p.ref + ' — "' + short + '"</div>';
+  }
+  const finalShort = finalPick.text.length > 60 ? finalPick.text.slice(0, 60) + '...' : finalPick.text;
+  html += '<div class="spin-drum-item">' + finalPick.ref + ' — "' + finalShort + '"</div>';
+  for (let i = 0; i < PAD; i++) {
+    html += '<div class="spin-drum-item"></div>';
+  }
+
+  track.innerHTML = html;
+  track.style.transition = 'none';
+  track.style.transform = 'translateY(0)';
+
+  const targetOffset = TOTAL * ITEM_H;
+  let startTime = null;
+  const duration = 3200;
+
+  function easeOutCubic(t) {
+    return 1 - Math.pow(1 - t, 3);
+  }
+
+  function animate(timestamp) {
+    if (!startTime) startTime = timestamp;
+    const elapsed = timestamp - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    const eased = easeOutCubic(progress);
+    const currentOffset = eased * targetOffset;
+
+    track.style.transition = 'none';
+    track.style.transform = 'translateY(-' + currentOffset + 'px)';
+
+    const centerIdx = Math.round(currentOffset / ITEM_H) + PAD;
+    const items = track.querySelectorAll('.spin-drum-item');
+    items.forEach(function(el, i) {
+      el.classList.toggle('active', i === centerIdx);
+      el.classList.toggle('near', i === centerIdx - 1 || i === centerIdx + 1);
+    });
+
+    if (progress < 1) {
+      requestAnimationFrame(animate);
+    } else {
+      track.style.transform = 'translateY(-' + targetOffset + 'px)';
+      drumRef.textContent = finalPick.ref + ' — ' + finalPick.book;
+      drumRef.classList.add('show');
+
+      setTimeout(function() {
+        drumWrap.style.display = 'none';
+        drumRef.classList.remove('show');
         currentSpinRef = finalPick.ref;
         currentSpinVerse = finalPick.text;
         document.getElementById('spin-book').textContent = finalPick.book;
         document.getElementById('spin-ref-display').textContent = finalPick.ref;
         document.getElementById('spin-verse-text').textContent = '"' + finalPick.text + '"';
-        document.getElementById('spin-ai-output').innerHTML = '';
         result.classList.add('show');
         btn.disabled = false;
         btn.textContent = '🎲 Spin Again';
         btn.classList.remove('spinning');
-      }, 400);
+      }, 800);
     }
-  }, 100);
+  }
 
-  // old code replaced - return early
-  return;
-  const _unused = () => {
-  const allVerses = [];
-  BOOKS.forEach(book => {
-    book.key_verses.forEach(v => {
-      allVerses.push({ book: book.name, ref: v.ref, text: v.text });
-    });
-  });
-  const pick = allVerses[Math.floor(Math.random() * allVerses.length)];
-  currentSpinRef = pick.ref;
-  currentSpinVerse = pick.text;
-
-  document.getElementById('spin-book').textContent = pick.book;
-  document.getElementById('spin-ref-display').textContent = pick.ref;
-  document.getElementById('spin-verse-text').textContent = '"' + pick.text + '"';
-  document.getElementById('spin-ai-output').innerHTML = '';
-  const result = document.getElementById('spin-result');
-  result.classList.remove('show');
-  setTimeout(() => result.classList.add('show'), 50);
-  };
+  requestAnimationFrame(animate);
 }
 
 // ── AI BREAKDOWN ──────────────────────────────────────────────────────────────
