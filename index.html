@@ -1043,6 +1043,75 @@ async function signInWithGoogle() {
 
 async function signOut() {
   await sb.auth.signOut();
+  currentUser = null;
+  document.getElementById('auth-area').innerHTML =
+    '<button class="nav-btn primary" onclick="openAuthModal()">Sign in</button>';
+  showToast('Signed out', 'success');
+}
+
+let authMode = 'signin';
+
+function openAuthModal(title, sub) {
+  document.getElementById('auth-modal-title').textContent = title || 'Welcome to The Bible Desk';
+  document.getElementById('auth-modal-sub').textContent = sub || 'Sign in or create a free account to save your study notes.';
+  document.getElementById('auth-modal-overlay').classList.add('show');
+  document.getElementById('auth-email').value = '';
+  document.getElementById('auth-password').value = '';
+  document.getElementById('auth-error').classList.remove('show');
+  authMode = 'signin';
+  updateAuthModalMode();
+}
+
+function closeAuthModal() {
+  document.getElementById('auth-modal-overlay').classList.remove('show');
+}
+
+function updateAuthModalMode() {
+  const isSignIn = authMode === 'signin';
+  document.getElementById('auth-submit-btn').textContent = isSignIn ? 'Sign in' : 'Create account';
+  document.getElementById('auth-toggle-text').textContent = isSignIn ? "Don't have an account?" : 'Already have an account?';
+  document.getElementById('auth-toggle-link').textContent = isSignIn ? 'Create one free' : 'Sign in';
+  document.getElementById('auth-password').placeholder = isSignIn ? 'Password' : 'Create a password';
+}
+
+function toggleAuthMode() {
+  authMode = authMode === 'signin' ? 'signup' : 'signin';
+  updateAuthModalMode();
+  document.getElementById('auth-error').classList.remove('show');
+}
+
+async function submitAuth() {
+  const email = document.getElementById('auth-email').value.trim();
+  const password = document.getElementById('auth-password').value;
+  const errEl = document.getElementById('auth-error');
+  if (!email || !password) {
+    errEl.textContent = 'Please enter your email and password.';
+    errEl.classList.add('show');
+    return;
+  }
+  const btn = document.getElementById('auth-submit-btn');
+  btn.textContent = 'Loading...';
+  btn.disabled = true;
+  let result;
+  if (authMode === 'signin') {
+    result = await sb.auth.signInWithPassword({ email, password });
+  } else {
+    result = await sb.auth.signUp({ email, password });
+  }
+  btn.disabled = false;
+  updateAuthModalMode();
+  if (result.error) {
+    errEl.textContent = result.error.message;
+    errEl.classList.add('show');
+  } else if (authMode === 'signup' && !result.data.session) {
+    errEl.style.background = '#F0FDF4';
+    errEl.style.borderColor = '#86EFAC';
+    errEl.style.color = '#16A34A';
+    errEl.textContent = 'Check your email to confirm your account, then sign in.';
+    errEl.classList.add('show');
+  } else {
+    closeAuthModal();
+  }
 }
 
 function updatePlansGate() {
@@ -1361,7 +1430,7 @@ Pick the 3 most relevant verses. Use accurate verse text. Keep notes under 15 wo
       <div class="preview-intro">${data.intro}</div>
       ${versesHTML}
       <button class="study-btn" onclick="studyThisVerse()">
-        📖 Get Full AI Breakdown &rarr;
+        📖 Get Full Breakdown &rarr;
       </button>`;
 
   } catch(e) {
@@ -1369,7 +1438,7 @@ Pick the 3 most relevant verses. Use accurate verse text. Keep notes under 15 wo
     previewBody.innerHTML = `
       <div class="preview-intro">Here are some key Bible passages on this topic.</div>
       <button class="study-btn" onclick="studyThisVerse()">
-        📖 Get Full AI Breakdown &rarr;
+        📖 Get Full Breakdown &rarr;
       </button>`;
   }
 }
@@ -1651,6 +1720,14 @@ function showToast(msg, type='success') {
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 initAuth();
+
+// Close auth modal on overlay click
+const authOverlay = document.getElementById('auth-modal-overlay');
+if (authOverlay) {
+  authOverlay.addEventListener('click', function(e) {
+    if (e.target === this) closeAuthModal();
+  });
+}
 clearWorksheet();
 updateAuthGates();
 </script>
